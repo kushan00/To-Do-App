@@ -2,7 +2,7 @@ import { validationResult } from "express-validator";
 import { StatusCode , JWT_TOKEN_SECRET } from "../utils/constansts.js";
 import { jsonGenerate } from "../utils/helpers.js";
 import bcrypt from 'bcrypt'
-import User from "../models/User.js";
+import Admin from "../models/Admin.js";
 import jwt from 'jsonwebtoken'
 
 const Register = async (req,res) => {
@@ -13,28 +13,25 @@ const Register = async (req,res) => {
     res.json(jsonGenerate(StatusCode.VALIDATION_ERROR,"Validation error",errors.mapped()));
   }
   else{
-     const{name,username,password,email} = req.body;
+     const{adminID,adminUserName,adminPassword} = req.body;
      const  salt = await bcrypt.genSalt(10);
-     const hashPassword = await bcrypt.hash(password,salt);
-
+     const hashPassword = await bcrypt.hash(adminPassword,salt);
+    // console.log(hashPassword)
    
-    const userExists = await User.findOne({$or:[{
-        email:email
-    } , {
-        username : username
-    }]});
+    const userExists = await Admin.findOne({adminUserName : adminUserName});
 
     if(userExists){
-        return res.json(jsonGenerate(StatusCode.UNPROCESSABLE_ENTITY,"User or Email already exists",data));
+        return res.json(jsonGenerate(StatusCode.UNPROCESSABLE_ENTITY,"Admin already exists",userExists));
     }
      //save to DB
      try{
-        const result = await User.create({
-            name:name,
-            email:email,
-            username:username,
-            password:hashPassword
+        const result = await Admin.create({
+            adminID:adminID,
+            adminUserName:adminUserName,
+            adminPassword:hashPassword
         })
+
+        //console.log(adminPassword)
 
         const token = jwt.sign({userId:result._id},JWT_TOKEN_SECRET);
 

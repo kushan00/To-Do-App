@@ -1,8 +1,6 @@
 import {check} from "express-validator";
 
-export const RegisterSchema =[
-    check('adminID').trim().isAlphanumeric()
-    .withMessage("adminID should be Alphabets and numbers only"),
+export const LoginSchema =[
 
     check('adminUserName','adminUserName is required').exists()
     .isAlpha().withMessage('admin User Name should be letters only')
